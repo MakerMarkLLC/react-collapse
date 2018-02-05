@@ -173,17 +173,21 @@ export class Collapse extends React.PureComponent {
 
     return this.state.currentState === IDLING ? {
       // When completely stable, instantly jump to the position
-      defaultStyle: {height: this.state.to},
-      style: {height: this.state.to}
+      defaultStyle: {height: this.state.to, scale: this.state.to ? 1 : 0, x: this.state.to ? 120 : 0},
+      style: {height: this.state.to, scale: this.state.to ? 1 : 0, x: this.state.to ? 120 : 0 },
     } : {
       // Otherwise, animate
-      defaultStyle: {height: this.state.from},
-      style: {height: spring(this.state.to, {precision: SPRING_PRECISION, ...springConfig})}
+      defaultStyle: {height: this.state.from, scale: this.state.from ? 1 : 0, x: this.state.from ? 120 : 0},
+      style: {
+        height: spring(this.state.to, {precision: SPRING_PRECISION, ...springConfig}),
+        scale: spring(this.state.to ? 1 : 0, {precision: SPRING_PRECISION, ...springConfig}),
+        x: spring(this.state.to ? 120 : 0, {precision: SPRING_PRECISION, ...springConfig}),
+      }
     };
   };
 
 
-  renderContent = ({height}) => { // eslint-disable-line
+  renderContent = ({height, scale, x}) => { // eslint-disable-line
     const {
       isOpened: _isOpened,
       springConfig: _springConfig,
@@ -199,6 +203,8 @@ export class Collapse extends React.PureComponent {
       ...props
     } = this.props;
 
+    
+
     const {
       from,
       to
@@ -211,7 +217,12 @@ export class Collapse extends React.PureComponent {
       <div
         ref={this.onWrapperRef}
         className={theme.collapse}
-        style={{...this.getWrapperStyle(Math.max(0, height)), ...style}}
+        style={{
+          ...this.getWrapperStyle(Math.max(0, height)),
+          ...style,
+          transform: `scale(${scale})`,
+          transformOrigin: 'left center'
+        }}
         {...props}>
         <div ref={this.onContentRef} className={theme.content}>{children}</div>
       </div>

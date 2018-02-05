@@ -1,57 +1,46 @@
-.app {
-  padding: 20px;
-  min-height: 5000px;
+
+.tree {
+  position: absolute;
+  height: 800px;
 }
 
-.section {
-  padding-top: 30px;
+.node {
+  display: inline-block;
+  width: 0px;
+  height: 100%;
+  vertical-align: middle;
+  /* border: 1px solid #00FF00; */
+  overflow: visible;
+  position: relative;
+}
+.title {
+  position:absolute;
+  top: -1em;
+  opacity: 1;
+  left: 8px;
+}
+.circle {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 4px;
+  border-radius: 50%;
+  border: 2px solid #0000ff;
 }
 
-.subCollapse {
-  padding: 20px;
-}
-
-.text {
-  margin: 0;
-}
-
-.text p {
-  margin: 0;
-  padding: 10px;
-}
-
-.config {
-  padding-bottom: 20px;
-}
-
-.label {
-  padding-right: 20px;
-}
-
-.input {
-  margin-right: 10px;
-  margin-left: 10px;
+.inline-set {
+  display: inline-block;
+  height: 100%;
   vertical-align: middle;
 }
-
-.blob {
-  border-radius: 50vh;
-  background: rgba(96, 125, 139, 0.6);
-}
-
-.log {
-  padding: 0.5em;
-  font-size: 0.6em;
-  font-family: Menlo, Consolas, Monospaced, monospace;
-}
-
-.ReactCollapse--collapse {
-  max-width: 800px;
-  border: 1px solid rgba(3, 169, 244, 0.3);
-  border-radius: 10px;
-  background-color: rgba(100, 255, 100, 0.1);
-}
-
 .ReactCollapse--content {
+  border: 1px solid #333;
 }
 
+.branch {
+  display: inline-block;
+  vertical-align: middle;
+  /* border: 1px solid #aaa; */
+  min-width: 120px;
+  min-height: 40px;
+}
