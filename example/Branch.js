@@ -7,7 +7,9 @@ class Branch extends Component {
     super(props)
     this.state = {
       open: false,
-      heights: props.data.children ? props.data.children.map(c=>0) : []
+      heights: props.data.children ? props.data.children.map(c=>40) : [],
+      height: 40,
+      yPoints: props.data.children ? props.data.children.map(c=>21) : []
     }
   }
 
@@ -20,11 +22,20 @@ class Branch extends Component {
   toggleOpen() {
     const { open } = this.state;
     const { data } = this.props;
+    var height = !open ? data.children.length * 40 : 40;
+    var heights= this.props.data.children.map(c=>40);
+    let y = 0;
+    var yPoints= heights.map(h=>{
+      y+=h;
+      return y - (h/2)
+    });
     this.setState({
-      open:!open
+      open:!open,
+      height,
+      heights,
+      yPoints
     })
-    var adjust = !open ? data.children.length * 42 : 42;
-    this.bubbleUp(adjust, this.props.index)
+    this.props.bubbleUp(height, this.props.index)
 
   }
 
@@ -32,10 +43,18 @@ class Branch extends Component {
     var heights = this.state.heights;
     heights[i] = adjust;
     console.log(this.props.data.name, ' ', adjust, ' ', heights, ' ', i);
+    var height = heights.reduce((v, n)=>v+n, 0) || 40;
+    let y = 0;
+    var yPoints= heights.map(h=>{
+      y+=h;
+      return y - (h/2)
+    });
     this.setState({
-      heights
+      heights,
+      height,
+      yPoints
     })
-    this.props.bubbleUp(heights.reduce((v, n)=>v+n, 0), this.props.index)
+    this.props.bubbleUp(height, this.props.index)
   }
 
   render() {
@@ -47,7 +66,7 @@ class Branch extends Component {
     return (
       <Collapse
         isOpened={open} hasNestedCollapse={data.children && data.children.length > 0}>
-        <Motion defaultStyle={{width: 0}} style={{width: spring(this.state.open ? 120 : 0)}}>
+        <Motion defaultStyle={{width: 0}} style={{width: spring(this.state.open ? 180 : 0)}}>
           {({width}) => (
             <div
               className={`node ${open ? 'open' : ''}`}
@@ -56,18 +75,22 @@ class Branch extends Component {
               }}
               onClick={()=>data.children ? this.toggleOpen() : console.log('no children')}>
               <span className='title'>
-                {data.name} {this.state.heights.reduce((v, n)=>v+n, 0)}
+                {data.name} {this.state.height}
               </span>
               <div className='circle'/>
 
             </div>
           )}
         </Motion>
-        <svg width={'100%'} height={'100%'} style={{position:'absolute', left: '10px', zIndex: -1}}>
-          {this.state.open && data.children ? data.children.map((d, i)=>(
-            <line key={`svg${i}`} x1={0} y1={data.children.length / 2 * 60} x2={120} y2={i * 60} style={{stroke:'#46AEBF', strokeWidth:3}} />
-          )) : ''}
-        </svg>
+        <Motion style={{width: spring(this.state.open ? 180 : 0), y1: spring(this.state.height / 2)}}>
+          {({width, y1}) => (
+            <svg width={'100%'} height={'100%'} style={{position:'absolute', left: '10px', zIndex: -1}}>
+              {this.state.heights.map((h, i)=>(
+                <line key={`svg${i}`} x1={0} y1={y1} x2={width} y2={this.state.yPoints[i]} style={{stroke:'#46AEBF', strokeWidth:3}} />
+              ))}
+            </svg>
+          )}
+        </Motion>
 
 
         <div className='branch'>
