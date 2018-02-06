@@ -82,15 +82,16 @@ class Branch extends Component {
             </div>
           )}
         </Motion>
-        <Motion style={{width: spring(this.state.open ? 180 : 0), y1: spring(this.state.height / 2)}}>
-          {({width, y1}) => (
-            <svg width={'100%'} height={'100%'} style={{position:'absolute', left: '10px', zIndex: -1}}>
-              {this.state.heights.map((h, i)=>(
-                <line key={`svg${i}`} x1={0} y1={y1} x2={width} y2={this.state.yPoints[i]} style={{stroke:'#46AEBF', strokeWidth:3}} />
-              ))}
-            </svg>
-          )}
-        </Motion>
+
+        {this.state.heights.map((h, i)=>(
+          <Motion style={{width: spring(this.state.open ? 180 : 0),scale: spring(this.state.open ? 1 : 0), height: spring(this.state.open ? this.state.height : 0), y1: spring(this.state.height / 2), y2: spring(this.state.yPoints[i])}}>
+            {({width, height, y1, y2, scale}) => (
+              <svg width={'100%'} height={'100%'} style={{position:'absolute', transform: `scale(${scale})`,transformOrigin: 'left center', left: '10px', zIndex: -1}}>
+                <line key={`svg${i}`} x1={0} y1={y1} x2={width} y2={y2} style={{stroke:'#46AEBF', strokeWidth:1}} />
+              </svg>
+            )}
+          </Motion>
+        ))}
 
 
         <div className='branch'>

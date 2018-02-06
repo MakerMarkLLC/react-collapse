@@ -155,16 +155,16 @@ export class Collapse extends React.PureComponent {
     if (this.state.currentState === IDLING && this.state.to) {
       const {fixedHeight} = this.props;
       if (fixedHeight > -1) {
-        return {overflow: 'hidden', height: fixedHeight};
+        return {overflow: 'visible', height: fixedHeight};
       }
       return {height: 'auto'};
     }
 
     if (this.state.currentState === WAITING && !this.state.to) {
-      return {overflow: 'hidden', height: 0};
+      return {overflow: 'visible', height: 0};
     }
 
-    return {overflow: 'hidden', height: Math.max(0, height)};
+    return {overflow: 'visible', height: Math.max(0, height)};
   };
 
 
@@ -203,7 +203,7 @@ export class Collapse extends React.PureComponent {
       ...props
     } = this.props;
 
-    
+
 
     const {
       from,
