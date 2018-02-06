@@ -3,7 +3,7 @@ import {Motion, spring} from 'react-motion';
 // import Branch from './Branch';
 // import Seeds from './seeds';
 
-class CircleBranch extends Component {
+class Flower extends Component {
   constructor() {
     super()
     this.state = {
@@ -38,9 +38,11 @@ class CircleBranch extends Component {
       y,
       isOpen,
       name,
-      origin
+      origin,
+      parentSection
     } = this.props;
     const section = 2*Math.PI/sections.length;
+    const point = 2 + radius * 0.025;
 
     return (
       <Motion style={{
@@ -57,9 +59,10 @@ class CircleBranch extends Component {
               opacity: style.opacity
             }}>
             {sections.map((s, i)=>(
-              <CircleBranch
-                x={radius*Math.cos(section*i).toFixed(2)}
-                y={radius*Math.sin(section*i).toFixed(2)}
+              <Flower
+                x={radius*Math.cos(section*i+parentSection).toFixed(2)}
+                y={radius*Math.sin(section*i+parentSection).toFixed(2)}
+                parentSection={section}
                 name={s.name}
                 origin={{
                   x: style.x,
@@ -69,17 +72,25 @@ class CircleBranch extends Component {
                 sections={s.children || []}
                 isOpen={open}/>
             ))}
-            {sections.map(s=>(
-              <svg width={`${radius}px`} height={`${radius}px`} style={{position:'absolute'}}>
-                <line x1={origin.x} y1={origin.y} x2={style.x} y2={style.y} style={{stroke:'#333', strokeWidth:1}} />
-              </svg>
-            ))}
+            <svg
+              title={name}
+              width={`${radius* 2}px`}
+              height={`${radius* 2}px`}
+              style={{
+                position:'absolute',
+                overflow: 'visible',
+                zIndex:-1
+              }}>
+              <line x1={-style.x} y1={-style.y} x2={0} y2={0} style={{stroke:'#333', strokeWidth:1}} />
+            </svg>
             <div
               onClick={()=>this.setState({open:!open})}
               className='point'
               style={{
-                left: 0,
-                top: 0,
+                left: -point,
+                top: -point,
+                width: `${2*point}px`,
+                height: `${2*point}px`
               }}>
               <span>{name}</span>
             </div>
@@ -90,4 +101,4 @@ class CircleBranch extends Component {
   }
 }
 
-export default CircleBranch;
+export default Flower;
