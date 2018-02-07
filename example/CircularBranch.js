@@ -13,6 +13,7 @@ class CircularBranch extends Component {
       open: false,
       height: props.height,
       heights: props.sections.map(s=>props.height),
+      descendants: [],
       points: props.sections.map((p,i)=>({
         x: Math.sqrt(Math.pow(this.radius, 2) - Math.pow((i*props.height-this.dif), 2)),
         y: (i*props.height-this.dif),
@@ -21,66 +22,41 @@ class CircularBranch extends Component {
   }
 
 
-    toggleOpen() {
-      const { open } = this.state;
-      const { sections } = this.props;
-      var height = !open ? sections.length * this.props.height : this.props.height;
-      var heights = sections.map(c=>this.props.height);
-      let y = 0;
-      var yPoints= heights.map(h=>{
-        y+=h;
-        return y - (h/2)
-      });
-      this.setState({
-        open:!open,
-        height,
-        heights,
-        points: props.sections.map((p,i)=>({
-          x: Math.sqrt(Math.pow(this.radius, 2) - Math.pow((i*props.height-this.dif), 2)),
-          y: (i*props.height-this.dif),
-        }))
-      })
-      this.props.bubbleUp(height, this.props.index)
+  toggleOpen() {
+    const { open } = this.state;
+    const { sections, index } = this.props;
+    const descendants = !open ? sections.map(s=>1) : [];
+    const descLen = descendants.reduce((v, n)=>v+n, 0) || 1;
 
-    }
-
-    bubbleUp(adjust, i) {
-      var heights = this.state.heights;
-      heights[i] = adjust;
-      console.log(this.props.data.name, ' ', adjust, ' ', heights, ' ', i);
-      var height = heights.reduce((v, n)=>v+n, 0) || 40;
-      let y = 0;
-      var yPoints= heights.map(h=>{
-        y+=h;
-        return y - (h/2)
-      });
-      this.setState({
-        heights,
-        height,
-        yPoints
-      })
-      this.props.bubbleUp(height, this.props.index)
-    }
-
-
-  circlePoints() {
-    const {sections, height} = this.props;
-    const {length} = sections;
-    var radius = length * (height/2)
-    var dif = (length-1) / 2 * height;
-    var points = Array.from({length}, (e, i)=>{
-      return {
-        x: Math.sqrt(Math.pow(radius, 2) - Math.pow((i*height)-dif, 2)),
-        y: (i*height)-dif,
-      }
-
+    this.setState({
+      open:!open,
+      descendants,
+      descLen
     })
-    return points;
+
+    this.props.descendants(descLen, index)
+
+  }
+
+  bubbleUp(adjust, i) {
+    console.log('bubble ',this.props.name, adjust, i);
+    const { descendants } = this.state;
+    const { index } = this.props;
+    descendants[i] = adjust;
+    const descLen = descendants.reduce((v, n)=>v+n, 0);
+
+    this.setState({
+      descendants,
+      descLen
+    })
+
+    this.props.descendants(descLen, index)
   }
 
   render() {
     const {
-      open
+      open,
+      descLen
     } = this.state;
 
     const {
@@ -89,19 +65,19 @@ class CircularBranch extends Component {
       y,
       height,
       isOpen,
-      name
+      name,
+      parentDif
     } = this.props;
 
     const length = sections.length;
-    const radius = length * (height/2);
-    const dif = (length-1) / 2 * height;
+    const radius = descLen * (height/2);
     const section = 2*Math.PI/sections.length;
     const point = 4;
 
     return (
       <Motion style={{
-          x: spring(isOpen ? open ? x + radius : x : 0),
-          y: spring(isOpen ? open ? y + this.state.height : y : 0),
+          x: spring(isOpen ? open && descLen ? x * descLen : x : 0),
+          y: spring(isOpen ? open && descLen ? y * descLen : y : 0),
           opacity: spring(isOpen ? 1 : 0)
         }}>
         {(style) => (
@@ -118,6 +94,8 @@ class CircularBranch extends Component {
                 y={s.y}
                 radius={radius}
                 height={height}
+                index={i}
+                descendants={(l, j)=>this.bubbleUp(l, j)}
                 sections={sections[i].children || []}
                 name={sections[i].name}
                 isOpen={open}/>
@@ -134,7 +112,7 @@ class CircularBranch extends Component {
               <line x1={-style.x} y1={-style.y} x2={0} y2={0} style={{stroke:'#333', strokeWidth:1}} />
             </svg>
             <div
-              onClick={()=>this.setState({open:!open})}
+              onClick={()=>this.toggleOpen()}
               className='point'
               style={{
                 left: -point,
